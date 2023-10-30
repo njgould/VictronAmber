@@ -142,11 +142,11 @@ class DbusAmberService:
         now = time.time()
 
         # response = requests.get(url=self._url, timeout=10).json()
-        # latency = time.time() - now
-        # if self._latency:
-        #     self._latency = (9 * self._latency + latency) / 10
-        # else:
-        #     self._latency = latency
+        latency = time.time() - now
+        if self._latency:
+            self._latency = (9 * self._latency + latency) / 10
+        else:
+            self._latency = latency
 
         # return response["Body"]["Data"]
         return 17
