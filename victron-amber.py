@@ -150,13 +150,9 @@ class DbusAmberService:
     def _get_amber_data(self):
         now = time.time()
 
-
-        # response = requests.get(url=self._url, timeout=10).json()
-
         response = requests.get(AmberURL, headers = amber_headers, timeout=10)
         amber_data = response.json()
-        feed_in = amber_data[2]['perKwh']
-
+        
 
         latency = time.time() - now
         if self._latency:
@@ -164,18 +160,38 @@ class DbusAmberService:
         else:
             self._latency = latency
 
-        # return response["Body"]["Data"]
-        return feed_in
+        return amber_data
 
     def _update(self):
         amber_data = self._get_amber_data()
+        import_price = amber_data[0]['perKwh']
+        export_price = amber_data[2]['perKwh']
    
-        self._dbusservice["/Current/FeedIn"] = amber_data
+        self._dbusservice["/ImportPrice"] = import_price
+        self._dbusservice["/ExportPrice"] = export_price
+        log.info(f"Import Price: {import_price}")
+        log.info(f"Export Price: {export_price}")
 
-        log.info(
-            "Current Feed In Price: %s, Latency: %.1fms"
-            % (amber_data, self._latency * 1000)
-        )
+        # Positive Export Prices = being charged to Export
+        # Negative prices = Paid to export
+        if export_price > 0:
+            log.info(f"Export Needs to be Minimised")
+            # Set Max Export to 0
+        else:
+            log.info(f"Export Needs to be Maximised")
+            # Set Max Export to 
+
+
+        if import_price < 0:
+            log.info(f"Import Should be Maximised")
+            # Set to Import From Grid
+        else:
+            log.info(f"Import Should be Minimised")            
+            # Set Max Export to 
+
+
+
+        log.info("Latency: %.1fms"% (self._latency * 1000))
         # increment UpdateIndex - to show that new data is available
         index = self._dbusservice[path_UpdateIndex] + 1  # increment index
         if index > 255:  # maximum value of the index
@@ -189,7 +205,8 @@ def main():
 
     root = logging.getLogger()
     # Log Level logging.INFO to get more details
-    root.setLevel(logging.ERROR)
+    # root.setLevel(logging.ERROR)
+    root.setLevel(logging.INFO)
 
     handler = logging.StreamHandler(sys.stdout)
     # Log Level logging.INFO to get more details
