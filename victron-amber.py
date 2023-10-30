@@ -31,7 +31,6 @@ from vedbus import VeDbusService, VeDbusItemImport
 
 log = logging.getLogger("DbusVictronAmber")
 path_UpdateIndex = "/UpdateIndex"
-amber_url = "Amber_url"
 
 
 class DbusAmberService:
@@ -69,7 +68,7 @@ class DbusAmberService:
             "/Mgmt/ProcessVersion",
             f"Running on Python {platform.python_version()}",
         )
-        self._dbusservice.add_path("/Mgmt/Connection", amber_url)
+        self._dbusservice.add_path("/Mgmt/Connection", 'Amber API Connection')
 
         # Create the mandatory objects
         self._dbusservice.add_path('/DeviceInstance', deviceinstance)
@@ -98,7 +97,10 @@ class DbusAmberService:
         _x = lambda p, v: (str(v or ''))
 
         self._paths = {
-            "/Current/FeedIn": {"initial": 0, "textformat": _c},
+            "/FeedIn": {"initial": 0, "textformat": _c},
+            "/AmberURL": {"initial": 'Not yet Set', "textformat": _x},
+            "/AmberToken": {"initial": 'Not yet Set', "textformat": _x},
+            "/AmberSiteID": {"initial": 'Not yet Set', "textformat": _x},
             "/Latency": {"initial": 0, "textformat": _ms},
             path_UpdateIndex: {"initial": 0, "textformat": _x},
         }
@@ -137,15 +139,21 @@ class DbusAmberService:
     def _get_amber_data(self):
         now = time.time()
 
-        # response = requests.get(url=self._url, timeout=10).json()
-        latency = time.time() - now
-        if self._latency:
-            self._latency = (9 * self._latency + latency) / 10
+        if self._dbusservice["/AmberURL"] == 'Not yet Set':
+            return 0
         else:
-            self._latency = latency
 
-        # return response["Body"]["Data"]
-        return 17
+            # response = requests.get(url=self._url, timeout=10).json()
+
+
+            latency = time.time() - now
+            if self._latency:
+                self._latency = (9 * self._latency + latency) / 10
+            else:
+                self._latency = latency
+
+            # return response["Body"]["Data"]
+            return 20
 
     def _update(self):
         amber_data = self._get_amber_data()
