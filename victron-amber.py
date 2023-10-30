@@ -117,6 +117,7 @@ class DbusAmberService:
         self._paths = {
             "/ImportPrice": {"initial": 0, "textformat": _c},
             "/ExportPrice": {"initial": 0, "textformat": _c},
+            "/Strategy": {"initial": 0, "textformat": _x},
             "/Latency": {"initial": 0, "textformat": _ms},
             path_UpdateIndex: {"initial": 0, "textformat": _x},
         }
@@ -179,26 +180,35 @@ class DbusAmberService:
 
         # Positive Export Prices = being charged to Export
         # Negative prices = Paid to export
-        if export_price > 0:
-            log.info(f"Export Needs to be Minimised")
-            # Set Target Grid Point to 0
-            self._modbusclient.write_register(2700, 0, unit=100)
-            # Set Max Export to 0
-            self._modbusclient.write_register(2706, 0, unit=100)
+        if export_price > -1:
+            if import_price < -10:
+                info = "Import is being Maximised"
+                # Set Target Grid Point to Import 25kw
+                self._modbusclient.write_register(2700, 25000, unit=100)
+                # Set Max Export to 0
+                self._modbusclient.write_register(2706, 0, unit=100)
+            else:
+                info = "Export/Import are being Minimised"
+                # Set Target Grid Point to 0kw
+                self._modbusclient.write_register(2700, 0, unit=100)
+                # Set Max Export to 0
+                self._modbusclient.write_register(2706, 0, unit=100)
         else:
-            log.info(f"Export Needs to be Maximised")
-            # Set Target Grid Point to Export 25kw
-            self._modbusclient.write_register(2700, 40536, unit=100)
-            # Set Max Export to 25kw
-            self._modbusclient.write_register(2706, 250, unit=100)
+            if export_price > 10:
+                info = "Export is being Maximised"
+                #Set Target Grid Point to Export 25kw
+                self._modbusclient.write_register(2700, 40536, unit=100)
+                # Set Max Export to 25kw
+                self._modbusclient.write_register(2706, 250, unit=100)
+            else:
+                info = "Export Surplus Only"
+                #Set Target Grid Point to Export 0kw
+                self._modbusclient.write_register(2700, 0, unit=100)
+                # Set Max Export to 25kw
+                self._modbusclient.write_register(2706, 250, unit=100)
 
 
-        if import_price < 0:
-            log.info(f"Import Should be Maximised")
-            # Set to Import From Grid
-        else:
-            log.info(f"Import Should be Minimised")            
-            # Set Max Export to 
+        self._dbusservice["/Strategy"] = info
 
 
 
