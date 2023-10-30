@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#	Victron-Amber
+#	Setup script (install/uninstall)
+#
+# this script will accept the following commands on the command line:
+#	setup install
+#	setup uninstall
+#	setup reinstall (used to reinstall after Venus OS update)
+
+packageLogFile="/var/log/VictonAmber/current"
+
+#### following line incorporates SetupHelper utilities into this script
+# Refer to the SetupHelper ReadMe file for details.
+
+source "/data/SetupHelper/CommonResources"
+
+# GitHub account info - fill in as appropriate
+# to include this package in SetupHelper automatic updates
+packageGitHubUser="NJGould"
+packageGitHubBranch="main"
+
+#### end of lines to include SetupHelper
+
+#### running manually and OK to proceed - prompt for input
+if [ "$scriptAction" == 'NONE' ] ; then
+    # display initial message
+    echo "This package gets the Spot price from Amber and publishes on DBus"
+
+    scriptAction='INSTALL'
+fi
+
+#### install code goes here
+if [ "$scriptAction" == 'INSTALL' ] ; then
+
+    logMessage "++ Installing Victron Dbus Amber service"
+
+    installService "$packageName"
+fi
+
+#### uninstalling - check scriptAction again
+# if an install step failed package needs to be removed
+if [ "$scriptAction" == 'UNINSTALL' ] ; then
+    logMessage "++ Uninstalling Victron Dbus Amber service"
+
+    removeService "$packageName"
+fi
+endScript
