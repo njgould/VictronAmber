@@ -20,7 +20,7 @@ import time
 import os
 import requests  # for http GET
 import pymodbus
-from pymodbus.client import ModbusTcpClient
+from pymodbus.client.sync import ModbusTcpClient as ModbusClient
     
 
 try:
