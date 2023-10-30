@@ -8,7 +8,7 @@
 #	setup uninstall
 #	setup reinstall (used to reinstall after Venus OS update)
 
-packageLogFile="/var/log/VictonAmber/current"
+packageLogFile="/var/log/VictronAmber/current"
 
 #### following line incorporates SetupHelper utilities into this script
 # Refer to the SetupHelper ReadMe file for details.

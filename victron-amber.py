@@ -31,6 +31,7 @@ from vedbus import VeDbusService, VeDbusItemImport
 
 log = logging.getLogger("DbusVictronAmber")
 path_UpdateIndex = "/UpdateIndex"
+amber_url = "Amber_url"
 
 
 class DbusAmberService:
@@ -68,20 +69,15 @@ class DbusAmberService:
             "/Mgmt/ProcessVersion",
             f"Running on Python {platform.python_version()}",
         )
-        # self._dbusservice.add_path("/Mgmt/Connection", self._ip)
+        self._dbusservice.add_path("/Mgmt/Connection", amber_url)
 
         # Create the mandatory objects
-        self._dbusservice.add_path("/DeviceInstance", deviceinstance)
-        # self._dbusservice.add_path(
-        #     "/ProductId", 16
-        # )  # value used in ac_sensor_bridge.cpp of dbus-cgwacs
-        # self._dbusservice.add_path(
-        #     "/ProductName",
-        #     data["Details"]["Manufacturer"] + " " + data["Details"]["Model"],
-        # )
-        # self._dbusservice.add_path("/FirmwareVersion", self._firmware)
-        # self._dbusservice.add_path("/HardwareVersion", data["Details"]["Serial"])
-        # self._dbusservice.add_path("/Connected", 1)
+        self._dbusservice.add_path('/DeviceInstance', deviceinstance)
+        self._dbusservice.add_path('/ProductId', 0)
+        self._dbusservice.add_path('/ProductName', 'Amber Pricing')
+        self._dbusservice.add_path('/FirmwareVersion', 0)
+        self._dbusservice.add_path('/HardwareVersion', 0)
+        self._dbusservice.add_path('/Connected', 1)
 
         # self.allowed_roles = ["grid"]
         # self.default_role = "grid"
@@ -119,7 +115,7 @@ class DbusAmberService:
         self._retries = 0
         self._failures = 0
         self._latency = None
-        gobject.timeout_add(700, self._safe_update)
+        gobject.timeout_add(1000, self._safe_update)
 
     def _handlechangedvalue(self, path, value):
         log.debug(f"someone else updated {path} to {value}")
@@ -208,7 +204,7 @@ def main():
     DBusGMainLoop(set_as_default=True)
 
     pvac_output = DbusAmberService(
-        servicename="com.victronenergy.amber", deviceinstance=0
+        servicename="com.victronenergy.amber", deviceinstance=1
     )
 
     logging.info(
