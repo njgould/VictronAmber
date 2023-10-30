@@ -35,7 +35,12 @@ from vedbus import VeDbusService, VeDbusItemImport
 # It needs to define AmberToken, AmberSiteID, AmberURL
 # Place in /data/keys so it doesn't get rewritten when the package is updated...
 sys.path.append('/data/keys')
-import amber_secrets
+from amber_secrets import AmberToken, AmberSiteID, AmberURL
+
+amber_headers = {
+    'Accept': 'application/json',
+    'Authorization': f"Bearer {AmberToken}"
+    }
 
 
 log = logging.getLogger("DbusVictronAmber")
@@ -123,7 +128,7 @@ class DbusAmberService:
         self._retries = 0
         self._failures = 0
         self._latency = None
-        gobject.timeout_add(1000, self._safe_update)
+        gobject.timeout_add(5000, self._safe_update)
 
     def _handlechangedvalue(self, path, value):
         log.debug(f"someone else updated {path} to {value}")
@@ -145,21 +150,22 @@ class DbusAmberService:
     def _get_amber_data(self):
         now = time.time()
 
-        if self._dbusservice["/AmberURL"] == 'Not yet Set':
-            return 0
+
+        # response = requests.get(url=self._url, timeout=10).json()
+
+        response = requests.get(AmberURL, headers = amber_headers, timeout=10)
+        amber_data = response.json()
+        feed_in = amber_data[2]['perKwh']
+
+
+        latency = time.time() - now
+        if self._latency:
+            self._latency = (9 * self._latency + latency) / 10
         else:
+            self._latency = latency
 
-            # response = requests.get(url=self._url, timeout=10).json()
-
-
-            latency = time.time() - now
-            if self._latency:
-                self._latency = (9 * self._latency + latency) / 10
-            else:
-                self._latency = latency
-
-            # return response["Body"]["Data"]
-            return 20
+        # return response["Body"]["Data"]
+        return feed_in
 
     def _update(self):
         amber_data = self._get_amber_data()
