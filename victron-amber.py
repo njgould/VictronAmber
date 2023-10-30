@@ -19,6 +19,7 @@ import sys
 import time
 import os
 import requests  # for http GET
+    
 
 try:
     import thread  # for daemon = True
@@ -26,8 +27,19 @@ except ImportError:
     import _thread as thread  # for daemon = True  / Python 3.x
 
 # use an established Victron service to maintain compatiblity
-sys.path.insert(1, os.path.join('/opt/victronenergy/dbus-systemcalc-py', 'ext', 'velib_python'))
+sys.path.insert(1, os.path.join('/data/keys', '/opt/victronenergy/dbus-systemcalc-py', 'ext', 'velib_python'))
 from vedbus import VeDbusService, VeDbusItemImport
+
+
+# create a file called amber_secrets.py
+# It needs to define AmberToken, AmberSiteID, AmberURL
+# Place in /data/keys
+
+
+try:
+    from amber_secrets import AmberURL, AmberToken, AmberSiteID 
+except ImportError:
+    log.error("Error Importing Amber Secrets")
 
 log = logging.getLogger("DbusVictronAmber")
 path_UpdateIndex = "/UpdateIndex"
@@ -98,9 +110,6 @@ class DbusAmberService:
 
         self._paths = {
             "/FeedIn": {"initial": 0, "textformat": _c},
-            "/AmberURL": {"initial": 'Not yet Set', "textformat": _x},
-            "/AmberToken": {"initial": 'Not yet Set', "textformat": _x},
-            "/AmberSiteID": {"initial": 'Not yet Set', "textformat": _x},
             "/Latency": {"initial": 0, "textformat": _ms},
             path_UpdateIndex: {"initial": 0, "textformat": _x},
         }
