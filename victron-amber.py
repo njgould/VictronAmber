@@ -21,6 +21,8 @@ import os
 import requests  # for http GET
 import pymodbus
 from pymodbus.client.sync import ModbusTcpClient
+from pymodbus.constants import Endian
+from pymodbus.payload import BinaryPayloadDecoder
     
 
 try:
@@ -178,6 +180,13 @@ class DbusAmberService:
         log.info(f"Import Price: {import_price}")
         log.info(f"Export Price: {export_price}")
 
+
+        # Get Current SOC (expressed as a %)
+        result = self._modbusclient.read_input_registers(843, 1)
+        decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=Endian.Big)
+        SOC = decoder.decode_16bit_uint()
+
+
         # Positive Export Prices = being charged to Export
         # Negative prices = Paid to export
         if export_price > -1:
@@ -194,7 +203,7 @@ class DbusAmberService:
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
         else:
-            if export_price > 10:
+            if export_price > 10 and SOC > 50:
                 info = "Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
