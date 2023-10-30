@@ -19,6 +19,8 @@ import sys
 import time
 import os
 import requests  # for http GET
+import pymodbus
+from pymodbus.client import ModbusTcpClient
     
 
 try:
@@ -74,6 +76,8 @@ class DbusAmberService:
         # data = self._get_amber_data()
 
         log.debug("%s /DeviceInstance = %d" % (servicename, deviceinstance))
+
+        self._modbusclient = ModbusTcpClient('localhost', port='502', unit_id=100)
 
         self._dbusservice = VeDbusService(servicename)
         # Create the management objects, as specified in the ccgx dbus-api document
@@ -177,10 +181,16 @@ class DbusAmberService:
         # Negative prices = Paid to export
         if export_price > 0:
             log.info(f"Export Needs to be Minimised")
+            # Set Target Grid Point to 0
+            self._modbusclient.write_register(2700, 0, unit=100)
             # Set Max Export to 0
+            self._modbusclient.write_register(2706, 0, unit=100)
         else:
             log.info(f"Export Needs to be Maximised")
-            # Set Max Export to 
+            # Set Target Grid Point to Export 25kw
+            self._modbusclient.write_register(2700, 40536, unit=100)
+            # Set Max Export to 25kw
+            self._modbusclient.write_register(2706, 250, unit=100)
 
 
         if import_price < 0:
