@@ -57,7 +57,7 @@ class DbusAmberService:
         # self._ip = ip or self.detect_dbus() or self.detect()
         # self._url = f"http://{self._ip}/solar_api/v1/GetMeterRealtimeData.cgi?Scope=Device&DeviceId=0&DataCollection=MeterRealtimeData"
 
-        data = self._get_amber_data()
+        # data = self._get_amber_data()
 
         log.debug("%s /DeviceInstance = %d" % (servicename, deviceinstance))
 
