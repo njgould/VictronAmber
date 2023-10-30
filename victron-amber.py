@@ -149,7 +149,7 @@ class DbusAmberService:
         #     self._latency = latency
 
         # return response["Body"]["Data"]
-        return "amber data"
+        return 17
 
     def _update(self):
         amber_data = self._get_amber_data()
