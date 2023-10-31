@@ -119,6 +119,7 @@ class DbusAmberService:
         self._paths = {
             "/ImportPrice": {"initial": 0, "textformat": _c},
             "/ExportPrice": {"initial": 0, "textformat": _c},
+            "/ExportPriceDisplay": {"initial": 0, "textformat": _c},
             "/Strategy": {"initial": 0, "textformat": _x},
             "/Latency": {"initial": 0, "textformat": _ms},
             path_UpdateIndex: {"initial": 0, "textformat": _x},
@@ -177,6 +178,7 @@ class DbusAmberService:
    
         self._dbusservice["/ImportPrice"] = import_price
         self._dbusservice["/ExportPrice"] = export_price
+        self._dbusservice["/ExportPriceDisplay"] = export_price * -1
         log.info(f"Import Price: {import_price}")
         log.info(f"Export Price: {export_price}")
 
