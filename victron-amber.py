@@ -197,7 +197,7 @@ class DbusAmberService:
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
             else:
-                info = "Export/Import are being Minimised"
+                info = "Export/Import is being Minimised"
                 # Set Target Grid Point to 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 0
@@ -210,7 +210,7 @@ class DbusAmberService:
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
             else:
-                info = "Export Surplus Only"
+                info = "Exporting Surplus Only"
                 #Set Target Grid Point to Export 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 25kw
