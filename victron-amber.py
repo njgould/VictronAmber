@@ -205,7 +205,7 @@ class DbusAmberService:
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
         else:
-            if export_price > 10 and SOC > 50:
+            if export_price < -10 and SOC > 50:
                 info = "Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
