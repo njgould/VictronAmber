@@ -259,8 +259,8 @@ class DbusAmberService:
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
 
-            # If it's after 7pm, and if export price is 20c or above, take batt to 50%  
-            elif export_price <= -20 and SOC > 50 and local_time_hour >= 19:
+            # If it's after 7pm, and if export price is 20c or above, take batt to 40%  
+            elif export_price <= -20 and SOC > 40 and local_time_hour >= 19:
                 info = "S9 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
