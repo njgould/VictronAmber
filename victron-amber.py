@@ -205,12 +205,36 @@ class DbusAmberService:
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
         else:
-            if export_price < -40 and SOC > 40:
+            if export_price < -30 and SOC > 80:
                 info = "Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
+            elif export_price < -35 and SOC > 60:
+                info = "Export is being Maximised"
+                #Set Target Grid Point to Export 25kw
+                self._modbusclient.write_register(2700, 40536, unit=100)
+                # Set Max Export to 25kw
+                self._modbusclient.write_register(2706, 250, unit=100)
+            elif export_price < -40 and SOC > 50:
+                info = "Export is being Maximised"
+                #Set Target Grid Point to Export 25kw
+                self._modbusclient.write_register(2700, 40536, unit=100)
+                # Set Max Export to 25kw
+                self._modbusclient.write_register(2706, 250, unit=100)
+            elif export_price < -50 and SOC > 40:
+                info = "Export is being Maximised"
+                #Set Target Grid Point to Export 25kw
+                self._modbusclient.write_register(2700, 40536, unit=100)
+                # Set Max Export to 25kw
+                self._modbusclient.write_register(2706, 250, unit=100)
+            elif export_price < -60 and SOC > 30:
+                info = "Export is being Maximised"
+                #Set Target Grid Point to Export 25kw
+                self._modbusclient.write_register(2700, 40536, unit=100)
+                # Set Max Export to 25kw
+                self._modbusclient.write_register(2706, 250, unit=100)                                  
             else:
                 info = "Exporting Surplus Only"
                 #Set Target Grid Point to Export 0kw
