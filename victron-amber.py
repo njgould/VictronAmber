@@ -137,7 +137,7 @@ class DbusAmberService:
         self._retries = 0
         self._failures = 0
         self._latency = None
-        gobject.timeout_add(5000, self._safe_update)
+        gobject.timeout_add(15000, self._safe_update)
 
     def _handlechangedvalue(self, path, value):
         log.debug(f"someone else updated {path} to {value}")
@@ -205,7 +205,7 @@ class DbusAmberService:
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
         else:
-            if export_price < -10 and SOC > 50:
+            if export_price < -40 and SOC > 40:
                 info = "Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
