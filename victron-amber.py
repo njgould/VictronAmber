@@ -262,7 +262,7 @@ class DbusAmberService:
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
 
-
+        info = f"{local_time_hour} {info}"
         self._dbusservice["/Strategy"] = info
 
 
