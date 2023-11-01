@@ -199,72 +199,83 @@ class DbusAmberService:
 
         # Positive Export Prices = being charged to Export
         # Negative prices = Paid to export
+
+        # When export price is less than 1c
         if export_price > -1:
-            if import_price < -5:
-                info = "Import is being Maximised (1)"
+
+            if import_price <= -5:
+                info = "S1 Import is being Maximised"
                 # Set Target Grid Point to Import 25kw
                 self._modbusclient.write_register(2700, 25000, unit=100)
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
             else:
-                info = "Export/Import is being Minimised (2)"
+                info = "S2 Export/Import is being Minimised"
                 # Set Target Grid Point to 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 0
                 self._modbusclient.write_register(2706, 0, unit=100)
+        
+        # When export price is 1c or more
         else:
-            if export_price < -30 and SOC > 80:
-                info = "Export is being Maximised (3)"
+            if export_price <= -30 and SOC > 80:
+                info = "S3 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
-            elif export_price < -35 and SOC > 60:
-                info = "Export is being Maximised (4)"
+            elif export_price <= -35 and SOC > 60:
+                info = "S4 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
-            elif export_price < -40 and SOC > 50:
-                info = "Export is being Maximised (5)"
+            elif export_price <= -40 and SOC > 50:
+                info = "S5 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
-            elif export_price < -50 and SOC > 40:
-                info = "Export is being Maximised (6)"
+            elif export_price <= -50 and SOC > 40:
+                info = "S6 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
-            elif export_price < -60 and SOC > 30:
-                info = "Export is being Maximised (7)"
+            elif export_price <= -60 and SOC > 30:
+                info = "S7 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
-            elif export_price < -20 and SOC > 50 and local_time_hour > 18:
-                info = "Export is being Maximised (8)"
+
+
+            # Extra Rules for later in the day when the 2 way tarrif is close to expiring...
+            # If it's after 6pm, and if export price is 30c or above, take batt to 60%
+            elif export_price <= -30 and SOC > 60 and local_time_hour >= 18:
+                info = "S8 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
-                self._modbusclient.write_register(2706, 250, unit=100)  
-            elif export_price < -20 and SOC > 40 and local_time_hour > 19:
-                info = "Export is being Maximised (9)"
+                self._modbusclient.write_register(2706, 250, unit=100)
+
+            # If it's after 7pm, and if export price is 20c or above, take batt to 50%  
+            elif export_price <= -20 and SOC > 50 and local_time_hour >= 19:
+                info = "S9 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
-                self._modbusclient.write_register(2706, 250, unit=100)                                                  
+                self._modbusclient.write_register(2706, 250, unit=100) 
+
+            # Fallback to export surplus only
             else:
-                info = "Exporting Surplus Only (10)"
+                info = "S10 Exporting Surplus Only"
                 #Set Target Grid Point to Export 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 25kw
                 self._modbusclient.write_register(2706, 250, unit=100)
 
-        info = f"{local_time_hour} {info}"
         self._dbusservice["/Strategy"] = info
-
 
 
         log.info("Latency: %.1fms"% (self._latency * 1000))
