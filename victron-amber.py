@@ -214,7 +214,8 @@ class DbusAmberService:
                 # Set Target Grid Point to 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 0
-                self._modbusclient.write_register(2706, 0, unit=100)
+                # self._modbusclient.write_register(2706, 0, unit=100)
+                self._modbusclient.write_register(2706, 250, unit=100)
         
         # When export price is 1c or more
         else:
