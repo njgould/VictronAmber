@@ -200,10 +200,10 @@ class DbusAmberService:
         # Positive Export Prices = being charged to Export
         # Negative prices = Paid to export
 
-        # When export price is less than 1c
-        if export_price > -1:
+        # When export price is less than 0c
+        if export_price > 0:
 
-            if import_price <= -5:
+            if import_price <= 5:
                 info = "S1 Import is being Maximised"
                 # Set Target Grid Point to Import 25kw
                 self._modbusclient.write_register(2700, 25000, unit=100)
