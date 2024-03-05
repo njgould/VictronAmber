@@ -262,7 +262,7 @@ class DbusAmberService:
             # Extra Rules for later in the day when the 2 way tarrif is close to expiring...
 
             # If it's after 4pm, and if export price is 15c or above, maximise export down to 90% SOC
-            elif export_price <= -15 and SOC > 90 and local_time_hour >= 16:
+            elif export_price <= -15 and SOC > 80 and local_time_hour >= 16:
                 info = "S8 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
@@ -271,7 +271,7 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
 
             # If it's after 5pm, and if export price is 15c or above, maximise export down to 70% SOC
-            elif export_price <= -15 and SOC > 70 and local_time_hour >= 17:
+            elif export_price <= -15 and SOC > 60 and local_time_hour >= 17:
                 info = "S9 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
@@ -280,7 +280,7 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
 
             # If it's after 6pm, and if export price is 15c or above, maximise export down to 50% SOC
-            elif export_price <= -15 and SOC > 50 and local_time_hour >= 18:
+            elif export_price <= -15 and SOC > 40 and local_time_hour >= 18:
                 info = "S10 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
@@ -289,7 +289,7 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
 
             # If it's after 7pm, and if export price is 20c or above, maximise export down to 30% SOC  
-            elif export_price <= -20 and SOC > 30 and local_time_hour >= 19:
+            elif export_price <= -20 and SOC > 20 and local_time_hour >= 19:
                 info = "S11 Export is being Maximised"
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
