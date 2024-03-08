@@ -345,8 +345,8 @@ class DbusAmberService:
             # If it's after 2pm, and if export price is 15c or above, and SOC is above 20%, don't charge the batteries... Just export.
             elif export_price <= -15 and SOC > 20 and local_time_hour >= 14:
                 info = "S12 Export is being prioritised"
-                # # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2705, 0, unit=100)
+                # # Set Max Charge Current to 0% (10 amps)
+                self._modbusclient.write_register(2705, 10, unit=100)
                 #Set Target Grid Point to Export 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 25kw
