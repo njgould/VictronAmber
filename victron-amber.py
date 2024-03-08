@@ -205,8 +205,8 @@ class DbusAmberService:
 
             if import_price <= 5:
                 info = "S1 Import is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 # Set Target Grid Point to Import 25kw
                 self._modbusclient.write_register(2700, -25000, unit=100)
                 # Set Max Export to 0
@@ -214,8 +214,8 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
             else:
                 info = "S2a Export is being Minimised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 # Set Target Grid Point to 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 0
@@ -228,8 +228,8 @@ class DbusAmberService:
         else:
             if export_price <= -40 and SOC > 70:
                 info = "S3 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -237,8 +237,8 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
             elif export_price <= -50 and SOC > 60:
                 info = "S4 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -246,8 +246,8 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
             elif export_price <= -60 and SOC > 50:
                 info = "S5 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -255,8 +255,8 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
             elif export_price <= -70 and SOC > 40:
                 info = "S6 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -264,8 +264,8 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
             elif export_price <= -80 and SOC > 30:
                 info = "S7 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -278,8 +278,8 @@ class DbusAmberService:
             # If it's after 2pm, and if export price is 15c or above, maximise export down to 80% SOC
             elif export_price <= -15 and SOC > 80 and local_time_hour >= 14:
                 info = "S8 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -290,8 +290,8 @@ class DbusAmberService:
             # If it's after 3pm, and if export price is 15c or above, maximise export down to 70% SOC
             elif export_price <= -15 and SOC > 70 and local_time_hour >= 15:
                 info = "S8 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -301,8 +301,8 @@ class DbusAmberService:
             # If it's after 4pm, and if export price is 15c or above, maximise export down to 60% SOC
             elif export_price <= -15 and SOC > 60 and local_time_hour >= 16:
                 info = "S8 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -312,8 +312,8 @@ class DbusAmberService:
             # If it's after 5pm, and if export price is 15c or above, maximise export down to 50% SOC
             elif export_price <= -15 and SOC > 50 and local_time_hour >= 17:
                 info = "S9 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -323,8 +323,8 @@ class DbusAmberService:
             # If it's after 6pm, and if export price is 15c or above, maximise export down to 40% SOC
             elif export_price <= -15 and SOC > 40 and local_time_hour >= 18:
                 info = "S10 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                  
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -334,8 +334,8 @@ class DbusAmberService:
             # If it's after 7pm, and if export price is 15 or above, maximise export down to 30% SOC  
             elif export_price <= -15 and SOC > 30 and local_time_hour >= 19:
                 info = "S11 Export is being Maximised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)                 
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)                
                 #Set Target Grid Point to Export 25kw
                 self._modbusclient.write_register(2700, 40536, unit=100)
                 # Set Max Export to 25kw
@@ -345,8 +345,8 @@ class DbusAmberService:
             # If it's after 2pm, and if export price is 15c or above, and SOC is above 20%, don't charge the batteries... Just export.
             elif export_price <= -15 and SOC > 20 and local_time_hour >= 14:
                 info = "S12 Export is being prioritised"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 0, unit=100)
+                # # Set Max Charge Current to 0%
+                self._modbusclient.write_register(2705, 0, unit=100)
                 #Set Target Grid Point to Export 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 25kw
@@ -357,8 +357,8 @@ class DbusAmberService:
             # Fallback to export surplus only
             else:
                 info = "S13 Exporting Surplus Only"
-                # Set Max Charge Current to 0%
-                self._modbusclient.write_register(2701, 100, unit=100)              
+                # Set Max Charge Current to Max
+                self._modbusclient.write_register(2705, 32767, unit=100)               
                 #Set Target Grid Point to Export 0kw
                 self._modbusclient.write_register(2700, 0, unit=100)
                 # Set Max Export to 25kw
