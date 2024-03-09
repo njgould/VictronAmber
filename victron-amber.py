@@ -35,7 +35,8 @@ except ImportError:
 
 # use an established Victron service to maintain compatiblity
 sys.path.insert(1, os.path.join('/opt/victronenergy/dbus-systemcalc-py', 'ext', 'velib_python'))
-from vedbus import VeDbusService, VeDbusItemImport
+from vedbus import VeDbusService, VeDbusItemImport, VeDbusItemExport
+from dbusmonitor import DbusMonitor
 
 
 os.environ['TZ'] = 'Australia/Sydney'
@@ -145,6 +146,18 @@ class DbusAmberService:
         self._failures = 0
         self._latency = None
         gobject.timeout_add(15000, self._safe_update)
+
+
+
+
+        monitorlist = {'com.victronenergy.battery': {
+                '/Dc/0/MaxChargeCurrent': 'MaxChargeCurrent'}
+                }
+
+        self.dbusmonitor = DbusMonitor(monitorlist)
+
+
+
 
     def _handlechangedvalue(self, path, value):
         log.debug(f"someone else updated {path} to {value}")
