@@ -150,11 +150,12 @@ class DbusAmberService:
 
 
 
-        monitorlist = {'com.victronenergy.battery': {
+        monitorlist = {'com.victronenergy.vebus.ttyUSB0': {
                 '/Dc/0/MaxChargeCurrent': 'MaxChargeCurrent'}
                 }
 
         self.dbusmonitor = DbusMonitor(monitorlist)
+        self.dbusmonitor.set('MaxChargeCurrent', 20)
 
 
 
@@ -379,6 +380,8 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
 
         self._dbusservice["/Strategy"] = info
+
+        self.dbusmonitor.set_value(serviceName, path, defaultValue)
 
 
         log.info("Latency: %.1fms"% (self._latency * 1000))
