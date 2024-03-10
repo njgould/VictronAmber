@@ -236,7 +236,7 @@ class DbusAmberService:
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)
 
-    def export_surplus_only();
+    def export_surplus_only(self);
         # Set Allowable Charge Current to Max (140amps)
         subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
         #Set Target Grid Point to Export 0kw
