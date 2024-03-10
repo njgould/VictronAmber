@@ -146,6 +146,8 @@ class DbusAmberService:
         self._retries = 0
         self._failures = 0
         self._latency = None
+        self.allow_charge = True
+
         gobject.timeout_add(15000, self._safe_update)
 
 
@@ -193,8 +195,19 @@ class DbusAmberService:
 
         return amber_data
 
+    def update_allow_charging(self, allow_charge):
+        if not allow_charge == self.allow_charge:
+            self.allow_charge = allow_charge:
+            if self.allow_charge == True:
+                subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
+            else:
+                subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 0", shell=True) 
+
+
     def maximise_charge(self):
         # Set Allowable Charge Current to Max (140amps)
+        self.update_allow_charging(True)
+        self.update_allow_charging(True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         # Set Target Grid Point to Import Max
         self._modbusclient.write_register(2700, -32768, unit=100)
@@ -206,6 +219,7 @@ class DbusAmberService:
 
     def minimise_export(self):
         # Set Allowable Charge Current to Max (140amps)
+        self.update_allow_charging(True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         # Set Target Grid Point to 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
@@ -217,6 +231,7 @@ class DbusAmberService:
 
     def maximise_export(self):
         # Set Allowable Charge Current to Max (140amps)
+        self.update_allow_charging(True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         #Set Target Grid Point to Export Max
         self._modbusclient.write_register(2700, 32767, unit=100)
@@ -228,6 +243,7 @@ class DbusAmberService:
 
     def prioritise_export(self):
         # Set Allowable Charge Current to 0 Amps
+        self.update_allow_charging(False)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 0", shell=True) 
         #Set Target Grid Point to Export 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
@@ -238,6 +254,7 @@ class DbusAmberService:
 
     def export_surplus_only(self):
         # Set Allowable Charge Current to Max (140amps)
+        self.update_allow_charging(True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
         #Set Target Grid Point to Export 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
@@ -267,7 +284,7 @@ class DbusAmberService:
 
 
         target_soc = 15 # Target Soc at end of tarrif change (i.e 8pm)
-        soc_delta = 12 # reduction in soc in 1 hour of max discharge
+        soc_delta = 13 # reduction in soc in 1 hour of max discharge
 
 
         # Positive Export Prices = being charged to Export
@@ -306,38 +323,38 @@ class DbusAmberService:
 
             # Extra Rules for later in the day when the 2 way tarrif is in play...
 
-            # If it's after 2pm, and if export price is 15c or above, maximise export down to 80% SOC
-            elif export_price <= -15 and SOC > (target_soc + 6*soc_delta) and local_time_hour >= 14:
+            # If it's after 2pm (6hrs before the tarriff ends)
+            elif export_price <= -15 and SOC > (target_soc + 5*soc_delta) and local_time_hour >= 14:
                 info = "S8 Export is being Maximised"
                 self.maximise_export()
 
-            # If it's after 3pm, and if export price is 15c or above, maximise export down to 70% SOC
-            elif export_price <= -15 and SOC > (target_soc + 5*soc_delta) and local_time_hour >= 15:
+            # If it's after 3pm (5hrs before the tarriff ends)
+            elif export_price <= -15 and SOC > (target_soc + 4*soc_delta) and local_time_hour >= 15:
                 info = "S8 Export is being Maximised"
                 self.maximise_export()
 
-            # If it's after 4pm, and if export price is 15c or above, maximise export down to 60% SOC
-            elif export_price <= -15 and SOC > (target_soc + 4*soc_delta) and local_time_hour >= 16:
+            # If it's after 4pm (4hrs before the tarriff ends)
+            elif export_price <= -15 and SOC > (target_soc + 3*soc_delta) and local_time_hour >= 16:
                 info = "S8 Export is being Maximised"
                 self.maximise_export()
 
-            # If it's after 5pm, and if export price is 15c or above, maximise export down to 50% SOC
-            elif export_price <= -15 and SOC > (target_soc + 3*soc_delta) and local_time_hour >= 17:
+            # If it's after 5pm (3hrs before the tarriff ends)
+            elif export_price <= -15 and SOC > (target_soc + 2*soc_delta) and local_time_hour >= 17:
                 info = "S9 Export is being Maximised"
                 self.maximise_export()
 
-            # If it's after 6pm, and if export price is 15c or above, maximise export down to 40% SOC
-            elif export_price <= -15 and SOC > (target_soc + 2*soc_delta) and local_time_hour >= 18:
+            # If it's after 6pm (2hrs before the tarriff ends)
+            elif export_price <= -15 and SOC > (target_soc + 1*soc_delta) and local_time_hour >= 18:
                 info = "S10 Export is being Maximised"
                 self.maximise_export()
 
-            # If it's after 7pm, and if export price is 15 or above, maximise export down to 30% SOC  
-            elif export_price <= -15 and SOC > (target_soc + 1*soc_delta) and local_time_hour >= 19:
+            # If it's after 7pm (1 hrs before the tarriff ends)  
+            elif export_price <= -15 and SOC > target_soc and local_time_hour >= 19:
                 info = "S11 Export is being Maximised"
                 self.maximise_export()
 
-            # If it's after 2pm, and if export price is 15c or above, and SOC is above 20%, don't charge the batteries... Just export.
-            elif export_price <= -15 and SOC > 20 and local_time_hour >= 14:
+            # If it's after 2pm, and if export price is 15c or above, don't charge the batteries... Just export.
+            elif export_price <= -15 and SOC > target_soc and local_time_hour >= 14:
                 info = "S12 Export is being prioritised"
                 self.prioritise_export()
 
