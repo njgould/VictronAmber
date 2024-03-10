@@ -236,7 +236,7 @@ class DbusAmberService:
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)
 
-    def export_suplus();
+    def export_surplus_only();
         # Set Allowable Charge Current to Max (140amps)
         subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
         #Set Target Grid Point to Export 0kw
@@ -266,8 +266,8 @@ class DbusAmberService:
         SOC = decoder.decode_16bit_uint()
 
 
-        target_soc = 20 # Target Soc at end of tarrif change (i.e 8pm)
-        soc_delta = 13 # reduction in soc in 1 hour of max discharge
+        target_soc = 15 # Target Soc at end of tarrif change (i.e 8pm)
+        soc_delta = 12 # reduction in soc in 1 hour of max discharge
 
 
         # Positive Export Prices = being charged to Export
@@ -278,10 +278,10 @@ class DbusAmberService:
 
             if import_price <= 5:
                 info = "S1 Import is being Maximised"
-                maximise_charge()
+                self.maximise_charge()
             else:
                 info = "S2a Export is being Minimised"
-                minimise_export()
+                self.minimise_export()
 
 
         
@@ -289,64 +289,63 @@ class DbusAmberService:
         else:
             if export_price <= -40 and SOC > 70:
                 info = "S3 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
             elif export_price <= -50 and SOC > 60:
                 info = "S4 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
             elif export_price <= -60 and SOC > 50:
                 info = "S5 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
             elif export_price <= -70 and SOC > 40:
                 info = "S6 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
             elif export_price <= -80 and SOC > 30:
                 info = "S7 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
 
 
             # Extra Rules for later in the day when the 2 way tarrif is in play...
 
             # If it's after 2pm, and if export price is 15c or above, maximise export down to 80% SOC
-            elif export_price <= -15 and SOC > 80 and local_time_hour >= 14:
+            elif export_price <= -15 and SOC > (target_soc + 6*soc_delta) and local_time_hour >= 14:
                 info = "S8 Export is being Maximised"
-                maximise_export()
-
+                self.maximise_export()
 
             # If it's after 3pm, and if export price is 15c or above, maximise export down to 70% SOC
-            elif export_price <= -15 and SOC > 70 and local_time_hour >= 15:
+            elif export_price <= -15 and SOC > (target_soc + 5*soc_delta) and local_time_hour >= 15:
                 info = "S8 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
 
             # If it's after 4pm, and if export price is 15c or above, maximise export down to 60% SOC
-            elif export_price <= -15 and SOC > 60 and local_time_hour >= 16:
+            elif export_price <= -15 and SOC > (target_soc + 4*soc_delta) and local_time_hour >= 16:
                 info = "S8 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
 
             # If it's after 5pm, and if export price is 15c or above, maximise export down to 50% SOC
-            elif export_price <= -15 and SOC > 50 and local_time_hour >= 17:
+            elif export_price <= -15 and SOC > (target_soc + 3*soc_delta) and local_time_hour >= 17:
                 info = "S9 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
 
             # If it's after 6pm, and if export price is 15c or above, maximise export down to 40% SOC
-            elif export_price <= -15 and SOC > 40 and local_time_hour >= 18:
+            elif export_price <= -15 and SOC > (target_soc + 2*soc_delta) and local_time_hour >= 18:
                 info = "S10 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
 
             # If it's after 7pm, and if export price is 15 or above, maximise export down to 30% SOC  
-            elif export_price <= -15 and SOC > 30 and local_time_hour >= 19:
+            elif export_price <= -15 and SOC > (target_soc + 1*soc_delta) and local_time_hour >= 19:
                 info = "S11 Export is being Maximised"
-                maximise_export()
+                self.maximise_export()
 
             # If it's after 2pm, and if export price is 15c or above, and SOC is above 20%, don't charge the batteries... Just export.
             elif export_price <= -15 and SOC > 20 and local_time_hour >= 14:
                 info = "S12 Export is being prioritised"
-                prioritise_export()
+                self.prioritise_export()
 
 
             # Fallback to export surplus only
             else:
                 info = "S13 Exporting Surplus Only"
-                export_surplus_only()
+                self.export_surplus_only()
 
         self._dbusservice["/Strategy"] = info
 
