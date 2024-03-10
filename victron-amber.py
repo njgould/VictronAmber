@@ -193,7 +193,63 @@ class DbusAmberService:
 
         return amber_data
 
+    def maximise_charge(self):
+        log.info(f"maximise_charge")
+        # Set Allowable Charge Current to Max (140amps)
+        # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
+        # Set Target Grid Point to Import Max
+        # self._modbusclient.write_register(2700, -32768, unit=100)
+        # Set Max Export to 0
+        # self._modbusclient.write_register(2706, 0, unit=100)
+        # Dont't Allow Export (shape solar production)
+        # self._modbusclient.write_register(2708, 1, unit=100)     
 
+
+    def minimise_export(self):
+        log.info(f"minimise_export")
+        # Set Allowable Charge Current to Max (140amps)
+        # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
+        # Set Target Grid Point to 0kw
+        # self._modbusclient.write_register(2700, 0, unit=100)
+        # Set Max Export to 0
+        # self._modbusclient.write_register(2706, 250, unit=100)
+        # Dont't Allow Export (shape solar production)
+        # self._modbusclient.write_register(2708, 1, unit=100)
+
+
+    def maximise_export(self):
+        log.info(f"maximise_export")
+        # Set Allowable Charge Current to Max (140amps)
+        # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
+        #Set Target Grid Point to Export Max
+        # self._modbusclient.write_register(2700, 32767, unit=100)
+        # Set Max Export to 25kw
+        # self._modbus/client.write_register(2706, 250, unit=100)
+        # Allow Export
+        # self._modbusclient.write_register(2708, 0, unit=100)
+
+
+    def prioritise_export(self):
+        log.info(f"prioritise_export")
+        # Set Allowable Charge Current to 0 Amps
+        # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 0", shell=True) 
+        #Set Target Grid Point to Export 0kw
+        # self._modbusclient.write_register(2700, 0, unit=100)
+        # Set Max Export to 25kw
+        # self._modbusclient.write_register(2706, 250, unit=100)
+        # Allow Export
+        # self._modbusclient.write_register(2708, 0, unit=100)
+
+    def export_surplus_only(self);
+        log.info(f"export_surplus_only")
+        # Set Allowable Charge Current to Max (140amps)
+        # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
+        #Set Target Grid Point to Export 0kw
+        # self._modbusclient.write_register(2700, 0, unit=100)
+        # Set Max Export to 25kw
+        # self._modbusclient.write_register(2706, 250, unit=100)
+        # Allow Export
+        # self._modbusclient.write_register(2708, 0, unit=100)    
 
 
     def _update(self):
