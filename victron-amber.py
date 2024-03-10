@@ -215,7 +215,7 @@ class DbusAmberService:
         SOC = decoder.decode_16bit_uint()
 
 
-        
+
 
 
         # Positive Export Prices = being charged to Export
@@ -387,6 +387,7 @@ class DbusAmberService:
                 self._modbusclient.write_register(2708, 0, unit=100)
 
         self._dbusservice["/Strategy"] = info
+        print (info)
 
 
 
