@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Used https://github.com/victronenergy/velib_python/blob/master/dbusdummyservice.py as basis for this service.
@@ -398,6 +398,8 @@ class DbusAmberService:
             index = 0  # overflow from 255 to 0
         self._dbusservice[path_UpdateIndex] = index
         return amber_data
+
+
 
 
 def main():
