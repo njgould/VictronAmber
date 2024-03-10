@@ -243,13 +243,13 @@ class DbusAmberService:
     def export_surplus_only(self):
         log.info(f"export_surplus_only")
         # Set Allowable Charge Current to Max (140amps)
-        # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
+        subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
         #Set Target Grid Point to Export 0kw
-        # self._modbusclient.write_register(2700, 0, unit=100)
+        self._modbusclient.write_register(2700, 0, unit=100)
         # Set Max Export to 25kw
-        # self._modbusclient.write_register(2706, 250, unit=100)
+        self._modbusclient.write_register(2706, 250, unit=100)
         # Allow Export
-        # self._modbusclient.write_register(2708, 0, unit=100)    
+        self._modbusclient.write_register(2708, 0, unit=100)    
 
 
     def _update(self):
@@ -449,13 +449,13 @@ class DbusAmberService:
             else:
                 info = "S13 Exporting Surplus Only"
                 self.export_surplus_only()
-                # Set Max Charge Current to Max
-                subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
-                #Set Target Grid Point to Export 0kw
-                self._modbusclient.write_register(2700, 0, unit=100)
-                # Set Max Export to 25kw
-                self._modbusclient.write_register(2706, 250, unit=100)
-                self._modbusclient.write_register(2708, 0, unit=100)
+                # # Set Max Charge Current to Max
+                # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
+                # # #Set Target Grid Point to Export 0kw
+                # self._modbusclient.write_register(2700, 0, unit=100)
+                # # Set Max Export to 25kw
+                # self._modbusclient.write_register(2706, 250, unit=100)
+                # self._modbusclient.write_register(2708, 0, unit=100)
 
         self._dbusservice["/Strategy"] = info
         print (info)
