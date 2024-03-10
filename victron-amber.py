@@ -195,9 +195,9 @@ class DbusAmberService:
 
         return amber_data
 
-    def update_allow_charging(self, allow_charge):
+    def update_allow_charging(self, allow_charge = True):
         if not allow_charge == self.allow_charge:
-            self.allow_charge = allow_charge:
+            self.allow_charge = allow_charge
             if self.allow_charge == True:
                 subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
             else:
@@ -206,8 +206,7 @@ class DbusAmberService:
 
     def maximise_charge(self):
         # Set Allowable Charge Current to Max (140amps)
-        self.update_allow_charging(True)
-        self.update_allow_charging(True)
+        self.update_allow_charging(allow_charge = True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         # Set Target Grid Point to Import Max
         self._modbusclient.write_register(2700, -32768, unit=100)
@@ -219,7 +218,7 @@ class DbusAmberService:
 
     def minimise_export(self):
         # Set Allowable Charge Current to Max (140amps)
-        self.update_allow_charging(True)
+        self.update_allow_charging(allow_charge = True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         # Set Target Grid Point to 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
@@ -231,7 +230,7 @@ class DbusAmberService:
 
     def maximise_export(self):
         # Set Allowable Charge Current to Max (140amps)
-        self.update_allow_charging(True)
+        self.update_allow_charging(allow_charge = True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         #Set Target Grid Point to Export Max
         self._modbusclient.write_register(2700, 32767, unit=100)
@@ -243,7 +242,7 @@ class DbusAmberService:
 
     def prioritise_export(self):
         # Set Allowable Charge Current to 0 Amps
-        self.update_allow_charging(False)
+        self.update_allow_charging(allow_charge = False)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 0", shell=True) 
         #Set Target Grid Point to Export 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
@@ -254,7 +253,7 @@ class DbusAmberService:
 
     def export_surplus_only(self):
         # Set Allowable Charge Current to Max (140amps)
-        self.update_allow_charging(True)
+        self.update_allow_charging(allow_charge = True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)              
         #Set Target Grid Point to Export 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
