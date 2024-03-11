@@ -209,7 +209,7 @@ class DbusAmberService:
         self.update_allow_charging(allow_charge = True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         # Set Target Grid Point to Import Max
-        self._modbusclient.write_register(2700, -32768, unit=100)
+        self._modbusclient.write_register(2700, -25000, unit=100)
         # Set Max Export to 0
         # self._modbusclient.write_register(2706, 0, unit=100)
         # Dont't Allow Export (shape solar production)
@@ -233,7 +233,7 @@ class DbusAmberService:
         self.update_allow_charging(allow_charge = True)
         # subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 140", shell=True)                  
         #Set Target Grid Point to Export Max
-        self._modbusclient.write_register(2700, 32767, unit=100)
+        self._modbusclient.write_register(2700, 40536, unit=100)
         # Set Max Export to 25kw
         # self._modbus/client.write_register(2706, 250, unit=100)
         # Allow Export
