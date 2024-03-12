@@ -126,9 +126,9 @@ class DbusAmberService:
         _x = lambda p, v: (str(v or ''))
 
         self._paths = {
-            "/ImportPrice": {"initial": 0, "textformat": _c},
-            "/ExportPrice": {"initial": 0, "textformat": _c},
-            "/ExportPriceDisplay": {"initial": 0, "textformat": _c},
+            "/ImportPrice": {"initial": 0, "textformat": _x},
+            "/ExportPrice": {"initial": 0, "textformat": _x},
+            "/ExportPriceDisplay": {"initial": 0, "textformat": _x},
             "/Strategy": {"initial": 0, "textformat": _x},
             "/Latency": {"initial": 0, "textformat": _ms},
             path_UpdateIndex: {"initial": 0, "textformat": _x},
