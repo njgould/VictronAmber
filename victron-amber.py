@@ -368,46 +368,50 @@ class DbusAmberService:
 
 
         # Extra Rules for later in the day when the 2 way tariff is in play...
+        elif export_price <= -30 and local_time_hour >= 14 and local_time_hour <= 20:
+            if minutes_till_tariff_end < minutes_till_target:
+                info = f"Max Export ({minutes_till_target} Min till Target)"
+                self.maximise_export()
+            else:
+                info = "Export is being prioritised"
+                self.prioritise_export()   
 
-        elif export_price <= -30 and SOC > (target_soc + 5*soc_discharge_rate) and local_time_hour >= 14:
-            info = f"Max Export (limit at {target_soc + 5*soc_discharge_rate}% SOC)"
-            self.maximise_export()
+
+        # # If it's after 2pm (6hrs before the tariff ends)
+        # elif export_price <= -30 and SOC > (target_soc + 5*soc_discharge_rate) and local_time_hour >= 14:
+        #     info = f"Max Export (limit at {target_soc + 5*soc_discharge_rate}% SOC)"
+        #     self.maximise_export()
+
+        # # If it's after 3pm (5hrs before the tariff ends)
+        # elif export_price <= -30 and SOC > (target_soc + 4*soc_discharge_rate) and local_time_hour >= 15:
+        #     info = f"Max Export (limit at {target_soc + 4*soc_discharge_rate}% SOC)"
+        #     self.maximise_export()
+
+        # # If it's after 4pm (4hrs before the tariff ends)
+        # elif export_price <= -30 and SOC > (target_soc + 3*soc_discharge_rate) and local_time_hour >= 16:
+        #     info = f"Max Export (limit at {target_soc + 3*soc_discharge_rate}% SOC)"
+        #     self.maximise_export()
+
+        # # If it's after 5pm (3hrs before the tariff ends)
+        # elif export_price <= -30 and SOC > (target_soc + 2*soc_discharge_rate) and local_time_hour >= 17:
+        #     info = f"Max Export (limit at {target_soc + 2*soc_discharge_rate}% SOC)"
+        #     self.maximise_export()
+
+        # # If it's after 6pm (2hrs before the tariff ends)
+        # elif export_price <= -30 and SOC > (target_soc + 1*soc_discharge_rate) and local_time_hour >= 18:
+        #     info = f"Max Export (limit at {target_soc + 1*soc_discharge_rate}% SOC)"
+        #     self.maximise_export()
+
+        # # If it's after 7pm (1 hrs before the tariff ends)  
+        # elif export_price <= -30 and SOC > target_soc and local_time_hour >= 19:
+        #     info = f"Max Export (limit at {target_soc}% SOC)"
+        #     self.maximise_export()
 
 
-        # If it's after 2pm (6hrs before the tariff ends)
-        elif export_price <= -30 and SOC > (target_soc + 5*soc_discharge_rate) and local_time_hour >= 14:
-            info = f"Max Export (limit at {target_soc + 5*soc_discharge_rate}% SOC)"
-            self.maximise_export()
-
-        # If it's after 3pm (5hrs before the tariff ends)
-        elif export_price <= -30 and SOC > (target_soc + 4*soc_discharge_rate) and local_time_hour >= 30:
-            info = f"Max Export (limit at {target_soc + 4*soc_discharge_rate}% SOC)"
-            self.maximise_export()
-
-        # If it's after 4pm (4hrs before the tariff ends)
-        elif export_price <= -30 and SOC > (target_soc + 3*soc_discharge_rate) and local_time_hour >= 16:
-            info = f"Max Export (limit at {target_soc + 3*soc_discharge_rate}% SOC)"
-            self.maximise_export()
-
-        # If it's after 5pm (3hrs before the tariff ends)
-        elif export_price <= -30 and SOC > (target_soc + 2*soc_discharge_rate) and local_time_hour >= 17:
-            info = f"Max Export (limit at {target_soc + 2*soc_discharge_rate}% SOC)"
-            self.maximise_export()
-
-        # If it's after 6pm (2hrs before the tariff ends)
-        elif export_price <= -30 and SOC > (target_soc + 1*soc_discharge_rate) and local_time_hour >= 18:
-            info = f"Max Export (limit at {target_soc + 1*soc_discharge_rate}% SOC)"
-            self.maximise_export()
-
-        # If it's after 7pm (1 hrs before the tariff ends)  
-        elif export_price <= -30 and SOC > target_soc and local_time_hour >= 19:
-            info = f"Max Export (limit at {target_soc}% SOC)"
-            self.maximise_export()
-
-        # If it's after 2pm, and if export price is 30c or above, don't charge the batteries... Just export.
-        elif export_price <= -30 and SOC > target_soc and local_time_hour >= 14:
-            info = "Export is being prioritised"
-            self.prioritise_export()
+        # # If it's after 2pm, and if export price is 30c or above, don't charge the batteries... Just export.
+        # elif export_price <= -30 and SOC > target_soc and local_time_hour >= 14:
+        #     info = "Export is being prioritised"
+        #     self.prioritise_export()
 
 
         # Fallback to export surplus only
