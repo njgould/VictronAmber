@@ -373,7 +373,7 @@ class DbusAmberService:
                 info = f"Max Export ({minutes_till_target} Min till Target)"
                 self.maximise_export()
             else:
-                info = "Export is being prioritised"
+                info = f"Prioritise Export ({minutes_till_tariff_end}>{minutes_till_target})"
                 self.prioritise_export()   
 
 
