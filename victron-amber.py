@@ -280,7 +280,7 @@ class DbusAmberService:
         if import_price <= 5:
             info = "Charging with Cheap Power"
             self.maximise_charge()
-        elif export_price > 0::
+        elif export_price > 0:
             info = "Limiting Export"
             self.minimise_export()
 
@@ -306,7 +306,6 @@ class DbusAmberService:
 
 
         # To ensure battery is charged before the 2 way tariff shift
-        # 
         elif import_price <= 25 and 14-local_time_hour < (100-SOC)/soc_charge_rate:
             info = f"Max Charge ({14-local_time_hour}hrs left, {(100-SOC)/soc_charge_rate}hrs req.)"
             self.maximise_charge()
