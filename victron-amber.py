@@ -208,9 +208,11 @@ class DbusAmberService:
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)
         # Set Target Grid Point to Import Max
-        self._modbusclient.write_register(2700, -5000, unit=100)
+        self._modbusclient.write_register(2700, 0, unit=100)
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)  
+
+
 
 
     def maximise_charge_prevent_export(self):
@@ -319,7 +321,7 @@ class DbusAmberService:
         # elif import_price <= 25 and 14-local_time_hour < (100-SOC)/soc_charge_rate:
         elif import_price <= 25:
             # info = f"Max Charge ({14-local_time_hour}hrs left, {(100-SOC)/soc_charge_rate}hrs req.)"
-            info = f"Max Charge"
+            info = f"Max Charge 123"
             self.maximise_charge()
             # self.export_surplus_only()
 
