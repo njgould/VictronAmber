@@ -230,8 +230,8 @@ class DbusAmberService:
     def prevent_discharge(self):
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)
-        # Set Target Grid Point to Import Max
-        self._modbusclient.write_register(2700, 30000, unit=100)
+        # Set Target Grid Point to 0kw
+        self._modbusclient.write_register(2700, 0, unit=100)
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100) 
         # Prevent Discharge
@@ -320,6 +320,7 @@ class DbusAmberService:
         max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
 
         minutes_till_full = (100-SOC) / max_soc_increase_per_min
+        minutes_till_target = (SOC - target_soc) / max_soc_decrease_per_min
 
 
         # Positive Export Prices = being charged to Export
