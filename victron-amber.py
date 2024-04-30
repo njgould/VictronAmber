@@ -319,8 +319,8 @@ class DbusAmberService:
         max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
         max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
 
-        minutes_till_full = (100-SOC) / max_soc_increase_per_min
-        minutes_till_target = (SOC - target_soc) / max_soc_decrease_per_min
+        minutes_till_full = round((100-SOC) / max_soc_increase_per_min)
+        minutes_till_target = round((SOC - target_soc) / max_soc_decrease_per_min)
 
 
         # Positive Export Prices = being charged to Export
