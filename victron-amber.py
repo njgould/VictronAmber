@@ -208,7 +208,7 @@ class DbusAmberService:
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)
         # Set Target Grid Point to Import Max
-        self._modbusclient.write_register(2700, 0, unit=100)
+        self._modbusclient.write_register(2700, 30000, unit=100)
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)  
 
@@ -219,7 +219,7 @@ class DbusAmberService:
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)
         # Set Target Grid Point to Import Max
-        self._modbusclient.write_register(2700, -25000, unit=100)
+        self._modbusclient.write_register(2700, 30000, unit=100)
         # Dont't Allow Export (shape solar production)
         self._modbusclient.write_register(2708, 1, unit=100)   
 
@@ -237,7 +237,8 @@ class DbusAmberService:
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)                
         #Set Target Grid Point to Export Max
-        self._modbusclient.write_register(2700, 40536, unit=100)
+        # If Grid Set point is set using modbus, then negative values are expressed as 65536 less the desired value.  EG. 35536 equates to  -30,000 i.e. Export 30kw to the grid
+        self._modbusclient.write_register(2700, 35536, unit=100)
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)
 
