@@ -319,14 +319,9 @@ class DbusAmberService:
 
 
         # To ensure battery is charged before the 2 way tariff shift
-        # elif import_price <= 25 and 14-local_time_hour < (100-SOC)/soc_charge_rate:
-        elif import_price <= 25:
-            # info = f"Max Charge ({14-local_time_hour}hrs left, {(100-SOC)/soc_charge_rate}hrs req.)"
-            info = f"Max Charge 123"
+        elif import_price <= 25 and 14-local_time_hour < (100-SOC)/soc_charge_rate:
+            info = f"Max Charge ({14-local_time_hour}hrs left, {(100-SOC)/soc_charge_rate}hrs req.)"
             self.maximise_charge()
-            # self.export_surplus_only()
-
-
 
 
         # Extra Rules for later in the day when the 2 way tariff is in play...
