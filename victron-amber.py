@@ -312,6 +312,10 @@ class DbusAmberService:
 
 
         target_soc = 15 # Target Soc at end of tariff change (i.e 8pm)
+
+        # Temp
+        soc_discharge_rate = 14
+
         max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
         max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
 
