@@ -210,8 +210,9 @@ class DbusAmberService:
         # Set Target Grid Point to Import Max
         self._modbusclient.write_register(2700, 30000, unit=100)
         # Allow Export
-        self._modbusclient.write_register(2708, 0, unit=100)  
-
+        self._modbusclient.write_register(2708, 0, unit=100)
+        # Prevent Discharge
+        self._modbusclient.write_register(2704, 0, unit=100)         
 
 
 
@@ -221,7 +222,20 @@ class DbusAmberService:
         # Set Target Grid Point to Import Max
         self._modbusclient.write_register(2700, 30000, unit=100)
         # Dont't Allow Export (shape solar production)
-        self._modbusclient.write_register(2708, 1, unit=100)   
+        self._modbusclient.write_register(2708, 1, unit=100)
+        # Prevent Discharge
+        self._modbusclient.write_register(2704, 0, unit=100)    
+
+
+    def prevent_discharge(self):
+        # Set Allowable Charge Current to Max (140amps)
+        self.update_allow_charging(allow_charge = True)
+        # Set Target Grid Point to Import Max
+        self._modbusclient.write_register(2700, 30000, unit=100)
+        # Allow Export
+        self._modbusclient.write_register(2708, 0, unit=100) 
+        # Prevent Discharge
+        self._modbusclient.write_register(2704, 0, unit=100) 
 
 
     def prevent_export(self):
@@ -231,6 +245,8 @@ class DbusAmberService:
         self._modbusclient.write_register(2700, 0, unit=100)
         # Dont't Allow Export (shape solar production)
         self._modbusclient.write_register(2708, 1, unit=100)
+        # Allow Discharge
+        self._modbusclient.write_register(2704, 3000, unit=100)          
 
 
     def maximise_export(self):
@@ -241,6 +257,8 @@ class DbusAmberService:
         self._modbusclient.write_register(2700, 35536, unit=100)
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)
+        # Allow Discharge
+        self._modbusclient.write_register(2704, 3000, unit=100)          
 
 
     def prioritise_export(self):
@@ -250,6 +268,9 @@ class DbusAmberService:
         self._modbusclient.write_register(2700, 0, unit=100)
         # Allow Export
         self._modbusclient.write_register(2708, 0, unit=100)
+        # Allow Discharge
+        self._modbusclient.write_register(2704, 3000, unit=100)          
+
 
     def export_surplus_only(self):
         # Set Allowable Charge Current to Max (140amps)
@@ -257,12 +278,23 @@ class DbusAmberService:
         #Set Target Grid Point to Export 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
         # Allow Export
-        self._modbusclient.write_register(2708, 0, unit=100)    
+        self._modbusclient.write_register(2708, 0, unit=100)   
+        # Allow Discharge
+        self._modbusclient.write_register(2704, 3000, unit=100)           
 
 
     def _update(self):
         amber_data = self._get_amber_data()
         local_time_hour = time.localtime()[3]
+        local_time_minutes = time.localtime()[4]
+        local_time_minutes_tally = (local_time_hour * 60) + local_time_minutes
+
+        tariff_start_minutes = 14 * 60
+        minutes_till_tariff_start = tariff_start_minutes - local_time_minutes_tally
+
+        tariff_end_minutes = 20 * 60
+        minutes_till_tariff_end = tariff_end_minutes - local_time_minutes_tally
+
         import_price = amber_data[0]['perKwh']
         export_price = amber_data[2]['perKwh']
    
@@ -280,8 +312,10 @@ class DbusAmberService:
 
 
         target_soc = 15 # Target Soc at end of tariff change (i.e 8pm)
-        soc_discharge_rate = 14 # reduction in soc in 1 hour of max discharge (nominal)
-        soc_charge_rate = 10 # increase in soc in 1 hour of max charge (nominal)
+        max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
+        max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
+
+        minutes_till_full = (100-SOC) / max_soc_increase_per_min
 
 
         # Positive Export Prices = being charged to Export
@@ -319,45 +353,54 @@ class DbusAmberService:
 
 
         # To ensure battery is charged before the 2 way tariff shift
-        elif import_price <= 25 and 14-local_time_hour < (100-SOC)/soc_charge_rate:
-            info = f"Max Charge ({14-local_time_hour}hrs left, {(100-SOC)/soc_charge_rate}hrs req.)"
+        elif import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
+            info = f"Max Charge ({minutes_till_full} Min to full)"
             self.maximise_charge()
+
+        elif import_price <= 25 and minutes_till_tariff_start < minutes_till_full:
+            info = f"Prevent Discharge"
+            self.prevent_discharge()
 
 
         # Extra Rules for later in the day when the 2 way tariff is in play...
 
+        elif export_price <= -30 and SOC > (target_soc + 5*soc_discharge_rate) and local_time_hour >= 14:
+            info = f"Max Export (limit at {target_soc + 5*soc_discharge_rate}% SOC)"
+            self.maximise_export()
+
+
         # If it's after 2pm (6hrs before the tariff ends)
-        elif export_price <= -15 and SOC > (target_soc + 5*soc_discharge_rate) and local_time_hour >= 14:
+        elif export_price <= -30 and SOC > (target_soc + 5*soc_discharge_rate) and local_time_hour >= 14:
             info = f"Max Export (limit at {target_soc + 5*soc_discharge_rate}% SOC)"
             self.maximise_export()
 
         # If it's after 3pm (5hrs before the tariff ends)
-        elif export_price <= -15 and SOC > (target_soc + 4*soc_discharge_rate) and local_time_hour >= 15:
+        elif export_price <= -30 and SOC > (target_soc + 4*soc_discharge_rate) and local_time_hour >= 30:
             info = f"Max Export (limit at {target_soc + 4*soc_discharge_rate}% SOC)"
             self.maximise_export()
 
         # If it's after 4pm (4hrs before the tariff ends)
-        elif export_price <= -15 and SOC > (target_soc + 3*soc_discharge_rate) and local_time_hour >= 16:
+        elif export_price <= -30 and SOC > (target_soc + 3*soc_discharge_rate) and local_time_hour >= 16:
             info = f"Max Export (limit at {target_soc + 3*soc_discharge_rate}% SOC)"
             self.maximise_export()
 
         # If it's after 5pm (3hrs before the tariff ends)
-        elif export_price <= -15 and SOC > (target_soc + 2*soc_discharge_rate) and local_time_hour >= 17:
+        elif export_price <= -30 and SOC > (target_soc + 2*soc_discharge_rate) and local_time_hour >= 17:
             info = f"Max Export (limit at {target_soc + 2*soc_discharge_rate}% SOC)"
             self.maximise_export()
 
         # If it's after 6pm (2hrs before the tariff ends)
-        elif export_price <= -15 and SOC > (target_soc + 1*soc_discharge_rate) and local_time_hour >= 18:
+        elif export_price <= -30 and SOC > (target_soc + 1*soc_discharge_rate) and local_time_hour >= 18:
             info = f"Max Export (limit at {target_soc + 1*soc_discharge_rate}% SOC)"
             self.maximise_export()
 
         # If it's after 7pm (1 hrs before the tariff ends)  
-        elif export_price <= -15 and SOC > target_soc and local_time_hour >= 19:
+        elif export_price <= -30 and SOC > target_soc and local_time_hour >= 19:
             info = f"Max Export (limit at {target_soc}% SOC)"
             self.maximise_export()
 
-        # If it's after 2pm, and if export price is 15c or above, don't charge the batteries... Just export.
-        elif export_price <= -15 and SOC > target_soc and local_time_hour >= 14:
+        # If it's after 2pm, and if export price is 30c or above, don't charge the batteries... Just export.
+        elif export_price <= -30 and SOC > target_soc and local_time_hour >= 14:
             info = "Export is being prioritised"
             self.prioritise_export()
 
