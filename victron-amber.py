@@ -204,36 +204,45 @@ class DbusAmberService:
                 subprocess.call("dbus -y com.victronenergy.vebus.ttyUSB0 /Dc/0/MaxChargeCurrent SetValue 0", shell=True) 
 
 
-    def maximise_charge(self):
+    def maximise_charge(self, export_price):
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)
         # Set Target Grid Point to Import Max
         self._modbusclient.write_register(2700, 30000, unit=100)
-        # Allow Export
-        self._modbusclient.write_register(2708, 0, unit=100)
+        if export_price > 0:
+            # Dont't Allow Export (shape solar production)
+            self._modbusclient.write_register(2708, 1, unit=100)            
+        else:
+            # Allow Export
+            self._modbusclient.write_register(2708, 0, unit=100)
+
         # Prevent Discharge
-        self._modbusclient.write_register(2704, 0, unit=100)         
+        self._modbusclient.write_register(2704, 0, unit=100) 
 
 
 
-    def maximise_charge_prevent_export(self):
-        # Set Allowable Charge Current to Max (140amps)
-        self.update_allow_charging(allow_charge = True)
-        # Set Target Grid Point to Import Max
-        self._modbusclient.write_register(2700, 30000, unit=100)
-        # Dont't Allow Export (shape solar production)
-        self._modbusclient.write_register(2708, 1, unit=100)
-        # Prevent Discharge
-        self._modbusclient.write_register(2704, 0, unit=100)    
+    # def maximise_charge_prevent_export(self):
+    #     # Set Allowable Charge Current to Max (140amps)
+    #     self.update_allow_charging(allow_charge = True)
+    #     # Set Target Grid Point to Import Max
+    #     self._modbusclient.write_register(2700, 30000, unit=100)
+    #     # Dont't Allow Export (shape solar production)
+    #     self._modbusclient.write_register(2708, 1, unit=100)
+    #     # Prevent Discharge
+    #     self._modbusclient.write_register(2704, 0, unit=100)    
 
 
-    def prevent_discharge(self):
+    def prevent_discharge(self, export_price):
         # Set Allowable Charge Current to Max (140amps)
         self.update_allow_charging(allow_charge = True)
         # Set Target Grid Point to 0kw
         self._modbusclient.write_register(2700, 0, unit=100)
-        # Allow Export
-        self._modbusclient.write_register(2708, 0, unit=100) 
+        if export_price > 0:
+            # Dont't Allow Export (shape solar production)
+            self._modbusclient.write_register(2708, 1, unit=100)            
+        else:
+            # Allow Export
+            self._modbusclient.write_register(2708, 0, unit=100)
         # Prevent Discharge
         self._modbusclient.write_register(2704, 0, unit=100) 
 
@@ -330,13 +339,13 @@ class DbusAmberService:
 
 
         # To ensure battery is charged before the 2 way tariff shift
-        if import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
+        if import_price <= 25 and minutes_till_tariff_start < minutes_till_full:
             info = f"Max Charge ({minutes_till_full} Min to full)"
-            self.maximise_charge()
+            self.maximise_charge(export_price)
 
-        elif import_price <= 25 and minutes_till_tariff_start < minutes_till_full:
+        elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
             info = f"Prevent Discharge"
-            self.prevent_discharge()
+            self.prevent_discharge(export_price)
 
 
 
@@ -373,8 +382,7 @@ class DbusAmberService:
         # When the feedin tariff goes negative: If the import price is low enough, maximise import, otherwise just minimise export.
         elif import_price <= 5:
             info = "Max Charge"
-            # If import price is < 5, then export price will be < 0, so export should be prevented also
-            self.maximise_charge_prevent_export()
+            self.maximise_charge(export_price)
         elif export_price > 0:
             info = "Preventing Export"
             self.prevent_export()
