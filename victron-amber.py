@@ -339,7 +339,7 @@ class DbusAmberService:
 
 
         # To ensure battery is charged before the 2 way tariff shift
-        if import_price <= 25 and minutes_till_tariff_start < minutes_till_full:
+        if import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
             info = f"Max Charge ({minutes_till_full} Min to full)"
             self.maximise_charge(export_price)
 
