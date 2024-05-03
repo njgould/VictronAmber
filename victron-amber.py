@@ -322,8 +322,6 @@ class DbusAmberService:
 
         target_soc = 15 # Target Soc at end of tariff change (i.e 8pm)
 
-        # Temp
-        soc_discharge_rate = 14
 
         max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
         max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
@@ -339,18 +337,18 @@ class DbusAmberService:
 
 
         # To ensure battery is charged before the 2 way tariff shift
-        if import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
-            info = f"Max Charge ({minutes_till_full} Min to full)"
-            self.maximise_charge(export_price)
+        if local_time_hour < 14: 
+            if import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
+                info = f"Max Charge ({minutes_till_full} Min to full)"
+                self.maximise_charge(export_price)
 
-        elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
-            info = f"Prevent Discharge"
-            self.prevent_discharge(export_price)
-
+            elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
+                info = f"Prevent Discharge"
+                self.prevent_discharge(export_price)
 
 
         # Export Power when the 2 way tariff is in play...
-        elif export_price <= -30 and local_time_hour >= 14 and local_time_hour <= 20:
+        elif local_time_hour >= 14 and local_time_hour <= 20 and export_price <= -30:
             if minutes_till_tariff_end < minutes_till_target:
                 info = f"Max Export ({minutes_till_target} Min till Target)"
                 self.maximise_export()
@@ -379,7 +377,7 @@ class DbusAmberService:
 
 
 
-        # When the feedin tariff goes negative: If the import price is low enough, maximise import, otherwise just minimise export.
+        # Import anytime price is lower than 5c.  Prevent export anytime feedin price is negative.
         elif import_price <= 5:
             info = "Max Charge"
             self.maximise_charge(export_price)
