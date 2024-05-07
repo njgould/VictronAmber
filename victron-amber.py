@@ -293,119 +293,121 @@ class DbusAmberService:
 
 
     def _update(self):
-        amber_data = self._get_amber_data()
+        self.maximise_export()
+        
+        # amber_data = self._get_amber_data()
 
         
-        local_time_hour = time.localtime()[3]
-        local_time_minutes = time.localtime()[4]
-        local_time_minutes_tally = (local_time_hour * 60) + local_time_minutes
+        # local_time_hour = time.localtime()[3]
+        # local_time_minutes = time.localtime()[4]
+        # local_time_minutes_tally = (local_time_hour * 60) + local_time_minutes
 
-        tariff_start_minutes = 14 * 60
-        minutes_till_tariff_start = tariff_start_minutes - local_time_minutes_tally
+        # tariff_start_minutes = 14 * 60
+        # minutes_till_tariff_start = tariff_start_minutes - local_time_minutes_tally
 
-        tariff_end_minutes = 20 * 60
-        minutes_till_tariff_end = tariff_end_minutes - local_time_minutes_tally
+        # tariff_end_minutes = 20 * 60
+        # minutes_till_tariff_end = tariff_end_minutes - local_time_minutes_tally
 
-        import_price = amber_data[0]['perKwh']
-        export_price = amber_data[2]['perKwh']
+        # import_price = amber_data[0]['perKwh']
+        # export_price = amber_data[2]['perKwh']
    
-        self._dbusservice["/ImportPrice"] = import_price
-        self._dbusservice["/ExportPrice"] = export_price
-        self._dbusservice["/ExportPriceDisplay"] = export_price * -1
-        log.info(f"Import Price: {import_price}")
-        log.info(f"Export Price: {export_price}")
+        # self._dbusservice["/ImportPrice"] = import_price
+        # self._dbusservice["/ExportPrice"] = export_price
+        # self._dbusservice["/ExportPriceDisplay"] = export_price * -1
+        # log.info(f"Import Price: {import_price}")
+        # log.info(f"Export Price: {export_price}")
 
 
-        # Get Current SOC (expressed as a %)
-        result = self._modbusclient.read_input_registers(843, 1)
-        decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=Endian.Big)
-        SOC = decoder.decode_16bit_uint()
+        # # Get Current SOC (expressed as a %)
+        # result = self._modbusclient.read_input_registers(843, 1)
+        # decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=Endian.Big)
+        # SOC = decoder.decode_16bit_uint()
 
 
-        target_soc = 15 # Target Soc at end of tariff change (i.e 8pm)
+        # target_soc = 15 # Target Soc at end of tariff change (i.e 8pm)
 
 
-        max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
-        max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
+        # max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
+        # max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
 
-        minutes_till_full = round((100-SOC) / max_soc_increase_per_min)
-        minutes_till_target = round((SOC - target_soc) / max_soc_decrease_per_min)
-
-
-        # Positive Export Prices = being charged to Export
-        # Negative prices = Paid to export
+        # minutes_till_full = round((100-SOC) / max_soc_increase_per_min)
+        # minutes_till_target = round((SOC - target_soc) / max_soc_decrease_per_min)
 
 
-
-
-        # To ensure battery is charged before the 2 way tariff shift
-        if local_time_hour < 14: 
-            if import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
-                info = f"Max Charge ({minutes_till_full} Min to full)"
-                self.maximise_charge(export_price)
-
-            elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
-                info = f"Prevent Discharge"
-                self.prevent_discharge(export_price)
+        # # Positive Export Prices = being charged to Export
+        # # Negative prices = Paid to export
 
 
 
 
-        # When the feed in price is positive
-        elif export_price <= -100 and SOC > 20:
-            info = "S6 Export is being Maximised"
-            self.maximise_export()
-        elif export_price <= -200 and SOC > 0:
-            info = "S7 Export is being Maximised"
-            self.maximise_export()
+        # # To ensure battery is charged before the 2 way tariff shift
+        # if local_time_hour < 14: 
+        #     if import_price <= 20 and minutes_till_tariff_start < minutes_till_full:
+        #         info = f"Max Charge ({minutes_till_full} Min to full)"
+        #         self.maximise_charge(export_price)
+
+        #     elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
+        #         info = f"Prevent Discharge"
+        #         self.prevent_discharge(export_price)
 
 
 
 
-
-        # Export Power when the 2 way tariff is in play...
-        elif local_time_hour >= 14 and local_time_hour <= 20 and export_price <= -30:
-            if minutes_till_tariff_end < minutes_till_target:
-                info = f"Max Export ({minutes_till_target} Min till Target)"
-                self.maximise_export()
-            else:
-                info = f"Prioritise Export ({minutes_till_tariff_end}>{minutes_till_target})"
-                self.prioritise_export()   
+        # # When the feed in price is positive
+        # elif export_price <= -100 and SOC > 20:
+        #     info = "S6 Export is being Maximised"
+        #     self.maximise_export()
+        # elif export_price <= -200 and SOC > 0:
+        #     info = "S7 Export is being Maximised"
+        #     self.maximise_export()
 
 
 
 
 
-
-
-        # Import anytime price is lower than 5c.  Prevent export anytime feedin price is negative.
-        elif import_price <= 5:
-            info = "Max Charge"
-            self.maximise_charge(export_price)
-        elif export_price > 0:
-            info = "Preventing Export"
-            self.prevent_export()
-
-
-
-        # Fallback to export surplus only
-        else:
-            info = "Exporting Surplus Only"
-            self.export_surplus_only()
+        # # Export Power when the 2 way tariff is in play...
+        # elif local_time_hour >= 14 and local_time_hour <= 20 and export_price <= -30:
+        #     if minutes_till_tariff_end < minutes_till_target:
+        #         info = f"Max Export ({minutes_till_target} Min till Target)"
+        #         self.maximise_export()
+        #     else:
+        #         info = f"Prioritise Export ({minutes_till_tariff_end}>{minutes_till_target})"
+        #         self.prioritise_export()   
 
 
 
-        self._dbusservice["/Strategy"] = info
 
 
 
-        log.info("Latency: %.1fms"% (self._latency * 1000))
-        # increment UpdateIndex - to show that new data is available
-        index = self._dbusservice[path_UpdateIndex] + 1  # increment index
-        if index > 255:  # maximum value of the index
-            index = 0  # overflow from 255 to 0
-        self._dbusservice[path_UpdateIndex] = index
-        return amber_data
+
+        # # Import anytime price is lower than 5c.  Prevent export anytime feedin price is negative.
+        # elif import_price <= 5:
+        #     info = "Max Charge"
+        #     self.maximise_charge(export_price)
+        # elif export_price > 0:
+        #     info = "Preventing Export"
+        #     self.prevent_export()
+
+
+
+        # # Fallback to export surplus only
+        # else:
+        #     info = "Exporting Surplus Only"
+        #     self.export_surplus_only()
+
+
+
+        # self._dbusservice["/Strategy"] = info
+
+
+
+        # log.info("Latency: %.1fms"% (self._latency * 1000))
+        # # increment UpdateIndex - to show that new data is available
+        # index = self._dbusservice[path_UpdateIndex] + 1  # increment index
+        # if index > 255:  # maximum value of the index
+        #     index = 0  # overflow from 255 to 0
+        # self._dbusservice[path_UpdateIndex] = index
+        # return amber_data
 
 
 def main():
