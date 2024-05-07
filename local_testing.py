@@ -49,11 +49,11 @@ minutes_till_tariff_start = tariff_start_minutes - local_time_minutes_tally
 print (minutes_till_tariff_start)
 print ()
 
-SOC = 24
+SOC = 19
 target_soc = 15 # Target Soc at end of tariff change (i.e 8pm)
 
 max_soc_decrease_per_min = 0.24 # reduction in soc in 1 min of max discharge (nominal)
-max_soc_increase_per_min = 0.18 # increase in soc in 1 min of max charge (nominal)
+max_soc_increase_per_min = 0.16 # increase in soc in 1 min of max charge (nominal)
 
 minutes_till_full = round((100-SOC) / max_soc_increase_per_min)
 minutes_till_target = round((SOC - target_soc) / max_soc_decrease_per_min)
@@ -63,3 +63,22 @@ print(minutes_till_target)
 
 if minutes_till_tariff_start < minutes_till_full:
     print (True)
+
+
+from google.oauth2.service_account import Credentials
+from googleapiclient.discovery import build
+
+
+print ("\nlogin using service account")
+
+
+print("Connecting to Google...")
+# Note the service account must be given access to the drive files / folders.  For shared drives it's easiest just to add the service account as a member of the shared drive using the service accounts email address.
+credentials = Credentials.from_service_account_file('projects/fabcontrol-159ae42905f9.json')
+print (credentials)
+print ("login succesfull.... ")
+
+
+service = build('drive', 'v3', credentials=credentials)
+print("Connected to Google Drive")
+

@@ -294,6 +294,8 @@ class DbusAmberService:
 
     def _update(self):
         amber_data = self._get_amber_data()
+
+        
         local_time_hour = time.localtime()[3]
         local_time_minutes = time.localtime()[4]
         local_time_minutes_tally = (local_time_hour * 60) + local_time_minutes
@@ -347,6 +349,20 @@ class DbusAmberService:
                 self.prevent_discharge(export_price)
 
 
+
+
+        # When the feed in price is positive
+        elif export_price <= -100 and SOC > 20:
+            info = "S6 Export is being Maximised"
+            self.maximise_export()
+        elif export_price <= -200 and SOC > 5:
+            info = "S7 Export is being Maximised"
+            self.maximise_export()
+
+
+
+
+
         # Export Power when the 2 way tariff is in play...
         elif local_time_hour >= 14 and local_time_hour <= 20 and export_price <= -30:
             if minutes_till_tariff_end < minutes_till_target:
@@ -358,22 +374,7 @@ class DbusAmberService:
 
 
 
-        # When the feed in price is positive
-        elif export_price <= -40 and SOC > 70:
-            info = "S3 Export is being Maximised"
-            self.maximise_export()
-        elif export_price <= -50 and SOC > 60:
-            info = "S4 Export is being Maximised"
-            self.maximise_export()
-        elif export_price <= -60 and SOC > 50:
-            info = "S5 Export is being Maximised"
-            self.maximise_export()
-        elif export_price <= -70 and SOC > 40:
-            info = "S6 Export is being Maximised"
-            self.maximise_export()
-        elif export_price <= -80 and SOC > 30:
-            info = "S7 Export is being Maximised"
-            self.maximise_export()
+
 
 
 
