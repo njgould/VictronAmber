@@ -355,7 +355,7 @@ class DbusAmberService:
         elif export_price <= -100 and SOC > 20:
             info = "S6 Export is being Maximised"
             self.maximise_export()
-        elif export_price <= -200 and SOC > 5:
+        elif export_price <= -200 and SOC > 0:
             info = "S7 Export is being Maximised"
             self.maximise_export()
 
