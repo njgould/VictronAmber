@@ -146,7 +146,9 @@ class DbusAmberService:
         self._retries = 0
         self._failures = 0
         self._latency = None
-        self.allow_charge = True
+
+        # Force initial setting of allow_charge
+        self.allow_charge = None
 
         gobject.timeout_add(15000, self._safe_update)
 
@@ -335,9 +337,9 @@ class DbusAmberService:
         # Negative prices = Paid to export
 
         
-        override = True
-        self.maximise_charge(export_price)
-        self._dbusservice["/Strategy"] = "Manual Max Charge"
+        override = False
+        # self.maximise_charge(export_price)
+        # self._dbusservice["/Strategy"] = "Manual Max Charge"
 
         if not override:
 
@@ -355,10 +357,10 @@ class DbusAmberService:
 
 
             # When the feed in price is positive
-            elif export_price <= -100 and SOC > 20:
+            elif export_price <= -100 and SOC > 15:
                 self._dbusservice["/Strategy"] = "S6 Export is being Maximised"
                 self.maximise_export()
-            elif export_price <= -200 and SOC > 0:
+            elif export_price <= -200:
                 self._dbusservice["/Strategy"] = "S7 Export is being Maximised"
                 self.maximise_export()
 
