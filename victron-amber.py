@@ -337,7 +337,8 @@ class DbusAmberService:
         # Negative prices = Paid to export
 
         
-        override = False
+        override = Treu
+        self.export_surplus_only()
         # self.maximise_charge(export_price)
         # self._dbusservice["/Strategy"] = "Manual Max Charge"
 
