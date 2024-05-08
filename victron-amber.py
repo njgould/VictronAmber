@@ -334,61 +334,65 @@ class DbusAmberService:
         # Positive Export Prices = being charged to Export
         # Negative prices = Paid to export
 
+        
+        override = True
+        self.maximise_charge(export_price)
+        self._dbusservice["/Strategy"] = "Manual Max Charge"
 
+        if not override:
 
+            # To ensure battery is charged before the 2 way tariff shift
+            if local_time_hour < 14: 
+                if import_price <= 35 and minutes_till_tariff_start < minutes_till_full:
+                    self._dbusservice["/Strategy"] = f"Max Charge ({minutes_till_full} Min to full)"
+                    self.maximise_charge(export_price)
 
-        # To ensure battery is charged before the 2 way tariff shift
-        if local_time_hour < 14: 
-            if import_price <= 35 and minutes_till_tariff_start < minutes_till_full:
-                self._dbusservice["/Strategy"] = f"Max Charge ({minutes_till_full} Min to full)"
-                self.maximise_charge(export_price)
-
-            elif import_price <= 40 and minutes_till_tariff_start < minutes_till_full:
-                self._dbusservice["/Strategy"] = f"Prevent Discharge"
-                self.prevent_discharge(export_price)
-
-
-
-
-        # When the feed in price is positive
-        elif export_price <= -100 and SOC > 20:
-            self._dbusservice["/Strategy"] = "S6 Export is being Maximised"
-            self.maximise_export()
-        elif export_price <= -200 and SOC > 0:
-            self._dbusservice["/Strategy"] = "S7 Export is being Maximised"
-            self.maximise_export()
+                elif import_price <= 40 and minutes_till_tariff_start < minutes_till_full:
+                    self._dbusservice["/Strategy"] = f"Prevent Discharge"
+                    self.prevent_discharge(export_price)
 
 
 
 
-
-        # Export Power when the 2 way tariff is in play...
-        elif local_time_hour >= 14 and local_time_hour <= 20 and export_price <= -30:
-            if minutes_till_tariff_end < minutes_till_target:
-                self._dbusservice["/Strategy"] = f"Max Export ({minutes_till_target} Min till Target)"
+            # When the feed in price is positive
+            elif export_price <= -100 and SOC > 20:
+                self._dbusservice["/Strategy"] = "S6 Export is being Maximised"
                 self.maximise_export()
+            elif export_price <= -200 and SOC > 0:
+                self._dbusservice["/Strategy"] = "S7 Export is being Maximised"
+                self.maximise_export()
+
+
+
+
+
+            # Export Power when the 2 way tariff is in play...
+            elif local_time_hour >= 14 and local_time_hour <= 20 and export_price <= -30:
+                if minutes_till_tariff_end < minutes_till_target:
+                    self._dbusservice["/Strategy"] = f"Max Export ({minutes_till_target} Min till Target)"
+                    self.maximise_export()
+                else:
+                    self._dbusservice["/Strategy"] = f"Prioritise Export ({minutes_till_tariff_end}>{minutes_till_target})"
+                    self.prioritise_export()   
+
+
+
+
+
+            # Import anytime price is lower than 5c.  Prevent export anytime feedin price is negative.
+            elif import_price <= 5:
+                self._dbusservice["/Strategy"] = "Max Charge"
+                self.maximise_charge(export_price)
+            elif export_price > 0:
+                self._dbusservice["/Strategy"] = "Preventing Export"
+                self.prevent_export()
+
+
+
+            # Fallback to export surplus only
             else:
-                self._dbusservice["/Strategy"] = f"Prioritise Export ({minutes_till_tariff_end}>{minutes_till_target})"
-                self.prioritise_export()   
-
-
-
-
-
-        # Import anytime price is lower than 5c.  Prevent export anytime feedin price is negative.
-        elif import_price <= 5:
-            self._dbusservice["/Strategy"] = "Max Charge"
-            self.maximise_charge(export_price)
-        elif export_price > 0:
-            self._dbusservice["/Strategy"] = "Preventing Export"
-            self.prevent_export()
-
-
-
-        # Fallback to export surplus only
-        else:
-            self._dbusservice["/Strategy"] = "Exporting Surplus Only"
-            self.export_surplus_only()
+                self._dbusservice["/Strategy"] = "Exporting Surplus Only"
+                self.export_surplus_only()
 
 
 
