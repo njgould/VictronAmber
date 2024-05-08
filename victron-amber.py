@@ -337,8 +337,8 @@ class DbusAmberService:
         # Negative prices = Paid to export
 
         
-        override = True
-        self.export_surplus_only()
+        override = False
+        # self.export_surplus_only()
         # self.maximise_charge(export_price)
         # self._dbusservice["/Strategy"] = "Manual Max Charge"
 
@@ -351,7 +351,7 @@ class DbusAmberService:
                     self.maximise_charge(export_price)
 
                 elif import_price <= 40 and minutes_till_tariff_start < minutes_till_full:
-                    self._dbusservice["/Strategy"] = f"Prevent Discharge 1"
+                    self._dbusservice["/Strategy"] = f"Prevent Discharge"
                     # self.prevent_discharge(export_price)
                     self.export_surplus_only()
 
