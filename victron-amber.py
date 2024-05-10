@@ -346,11 +346,11 @@ class DbusAmberService:
 
             # To ensure battery is charged before the 2 way tariff shift
             if local_time_hour < 14: 
-                if import_price <= 35 and minutes_till_tariff_start < minutes_till_full:
+                if import_price <= 22 and minutes_till_tariff_start < minutes_till_full:
                     self._dbusservice["/Strategy"] = f"Max Charge ({minutes_till_full} Min to full)"
                     self.maximise_charge(export_price)
 
-                elif import_price <= 40 and minutes_till_tariff_start < minutes_till_full:
+                elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
                     self._dbusservice["/Strategy"] = f"Prevent Discharge"
                     # self.prevent_discharge(export_price)
                     self.export_surplus_only()
