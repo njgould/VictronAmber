@@ -352,8 +352,7 @@ class DbusAmberService:
 
                 elif import_price <= 30 and minutes_till_tariff_start < minutes_till_full:
                     self._dbusservice["/Strategy"] = f"Prevent Discharge"
-                    # self.prevent_discharge(export_price)
-                    self.export_surplus_only()
+                    self.prevent_discharge(export_price)
 
 
 
